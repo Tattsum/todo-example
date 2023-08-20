@@ -1,8 +1,12 @@
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import React from 'react';
+import { ApolloProvider } from '@apollo/client';
+import client from './apolloClient';
+import TodoList from './TodoList';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
-});
+function App() {
+  return (
+    <ApolloProvider client={client}>
+      <TodoList />
+    </ApolloProvider>
+  );
+}
