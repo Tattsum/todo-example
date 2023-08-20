@@ -4,15 +4,29 @@ package graph
 
 import (
 	"context"
+	"strconv"
+	"time"
 	"todo-example/graph/generated"
 	"todo-example/graph/model"
+
+	"github.com/pkg/errors"
 )
 
-type Resolver struct{}
+type Resolver struct {
+	todos []*model.Todo
+}
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, title string, completed bool) (*model.Todo, error) {
-	panic("not implemented")
+	todo := &model.Todo{
+		ID:        strconv.Itoa(len(r.todos) + 1),
+		Title:     title,
+		CreatedAt: time.Now().Format(time.RFC3339),
+		UpdatedAt: time.Now().Format(time.RFC3339),
+	}
+
+	r.todos = append(r.todos, todo)
+	return todo, nil
 }
 
 // UpdateTodo is the resolver for the updateTodo field.
@@ -27,12 +41,17 @@ func (r *mutationResolver) DeleteTodo(ctx context.Context, id string) (*model.To
 
 // AllTodos is the resolver for the allTodos field.
 func (r *queryResolver) AllTodos(ctx context.Context) ([]*model.Todo, error) {
-	panic("not implemented")
+	return r.todos, nil
 }
 
 // GetTodoByID is the resolver for the getTodoById field.
 func (r *queryResolver) GetTodoByID(ctx context.Context, id string) (*model.Todo, error) {
-	panic("not implemented")
+	i, err := strconv.Atoi(id)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return r.todos[i+1], nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
